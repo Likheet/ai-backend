@@ -5,20 +5,26 @@ from functools import lru_cache
 from typing import Literal
 
 import pytz
-from pydantic import field_validator
+from pydantic import field_validator, ConfigDict
 from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
     
+    model_config = ConfigDict(
+        env_file=".env",
+        case_sensitive=False,
+        extra="ignore"
+    )
+    
     # Database
-    database_url: str
+    database_url: str = "postgresql://user:pass@localhost/aetheria"
     
     # Application
     app_env: Literal["dev", "prod"] = "dev"
     log_level: str = "INFO"
-    api_key: str = ""
+    api_key: str = "dev-api-key"
     
     # Timezone
     timezone: str = "Asia/Kolkata"
@@ -29,10 +35,6 @@ class Settings(BaseSettings):
     
     # CORS
     cors_origins: list[str] = ["http://localhost:3000", "http://localhost:3001"]
-    
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
     
     @field_validator("app_env")
     @classmethod
